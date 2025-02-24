@@ -1,9 +1,55 @@
-import { SILLOK_SEARCH_BASE_URL } from '@/constants/endpoints';
+import {
+  SILLOK_SEARCH_BASE_URL,
+  SILLOK_LANDING_URL,
+} from '@/constants/endpoints';
 import { parseKingYearData } from '@/utils/parseKingYearData';
-import { generateMetadata } from '@/utils/extractKingBasicInfo';
+import { extractKingBasicInfo } from '@/utils/extractKingBasicInfo';
+import { Metadata } from 'next';
 
-export { generateMetadata };
+// 1️⃣ 동적 경로 생성을 위한 함수
+export async function generateStaticParams() {
+  const response = await fetch(SILLOK_LANDING_URL);
 
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const html = await response.text();
+  const kingIds = Object.keys(extractKingBasicInfo(html)); // { koa: "광해군중초본", kob: "광해군정초본" }
+
+  return kingIds.map((kingId) => ({
+    kingId,
+  }));
+}
+
+// 2️⃣ SEO 메타데이터 생성 함수
+export async function generateMetadata({
+  params,
+}: {
+  params: { kingId: string };
+}): Promise<Metadata> {
+  const response = await fetch(SILLOK_LANDING_URL);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const html = await response.text();
+  const kingInfo = extractKingBasicInfo(html);
+
+  const kingTitle = kingInfo[params.kingId];
+
+  return {
+    title: kingTitle
+      ? `조선왕조실록 - ${kingTitle}`
+      : '조선왕조실록 상세 페이지',
+    description: kingTitle
+      ? `${kingTitle}의 상세 기록입니다.`
+      : '조선왕조실록에 대한 기록 페이지입니다.',
+  };
+}
+
+// 3️⃣ 페이지 컴포넌트
 interface KingDetailPageProps {
   params: {
     kingId: string;

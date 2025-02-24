@@ -1,9 +1,6 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { extractKingBasicInfo } from '@/utils/extractKingBasicInfo';
-import { FRONTEND_BASE_URL } from '@/constants/routes';
 import { SILLOK_LANDING_URL } from '@/constants/endpoints';
-
 
 export default async function Home() {
   const response = await fetch(SILLOK_LANDING_URL);
@@ -22,7 +19,7 @@ export default async function Home() {
           {Object.entries(kings).map(([id, name]) => (
             <li key={id} className="mb-2">
               <Link
-                href={`${FRONTEND_BASE_URL}/${id}`}
+                href={`/${id}`}
                 className="text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 dark:hover:text-blue-200 transition-colors"
               >
                 {name}

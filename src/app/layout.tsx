@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+import Link from 'next/link';
+import { URL_HOME } from '@/constants/routes';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,7 +32,9 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen">
           {/* 헤더 */}
           <header className="h-20 flex items-center justify-center bg-white dark:bg-gray-800 shadow-md">
-            <h1 className="text-xl font-bold">조선왕조실록</h1>
+            <Link href={URL_HOME}>
+              <h1 className="text-xl font-bold">조선왕조실록</h1>
+            </Link>
           </header>
 
           {/* Main Content */}

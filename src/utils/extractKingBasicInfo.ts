@@ -1,6 +1,9 @@
 import * as cheerio from 'cheerio';
 import { Metadata } from 'next';
-import { SILLOK_SEARCH_BASE_URL } from '@/constants/endpoints';
+import {
+  SILLOK_LANDING_URL,
+  SILLOK_SEARCH_BASE_URL,
+} from '@/constants/endpoints';
 
 export const extractKingBasicInfo = (html: string) => {
   const $ = cheerio.load(html);
@@ -23,6 +26,21 @@ export const extractKingBasicInfo = (html: string) => {
   return result;
 };
 
+export async function generateStaticParams() {
+  const response = await fetch(SILLOK_LANDING_URL);
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  const html = await response.text();
+  const kingIds = Object.keys(extractKingBasicInfo(html)); // { koa: "광해군중초본", kob: "광해군정초본" }
+
+  return kingIds.map((kingId) => ({
+    kingId,
+  }));
+}
+
 async function extractKingTitle(
   html: string,
   kingId: string,
@@ -35,31 +53,4 @@ async function extractKingTitle(
   }
 
   return null;
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: {
-    kingId: string;
-  };
-}): Promise<Metadata> {
-  const { kingId } = await params;
-  const response = await fetch(`${SILLOK_SEARCH_BASE_URL}?id=${kingId}`);
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const html = await response.text();
-  const kingTitle = await extractKingTitle(html, kingId);
-
-  return {
-    title: kingTitle
-      ? `조선왕조실록 - ${kingTitle}`
-      : '조선왕조실록 - 상세 페이지',
-    description: kingTitle
-      ? `${kingTitle}에 대한 상세 기록입니다.`
-      : '조선왕조실록의 상세 기록 페이지입니다.',
-  };
 }
