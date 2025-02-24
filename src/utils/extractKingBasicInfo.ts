@@ -1,9 +1,5 @@
 import * as cheerio from 'cheerio';
-import { Metadata } from 'next';
-import {
-  SILLOK_LANDING_URL,
-  SILLOK_SEARCH_BASE_URL,
-} from '@/constants/endpoints';
+import { SILLOK_LANDING_URL } from '@/constants/endpoints';
 
 export const extractKingBasicInfo = (html: string) => {
   const $ = cheerio.load(html);
