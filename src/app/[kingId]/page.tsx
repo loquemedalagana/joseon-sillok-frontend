@@ -55,7 +55,7 @@ interface KingDetailPageProps {
 }
 
 export default async function Page({ params }: KingDetailPageProps) {
-  const { kingId } = params;
+  const { kingId } = await params;
   const response = await fetch(`${SILLOK_SEARCH_BASE_URL}?id=${kingId}`);
 
   if (!response.ok) {
