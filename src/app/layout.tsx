@@ -21,37 +21,43 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="ko" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100`}
       >
         <div className="flex flex-col min-h-screen">
           {/* 헤더 */}
-          <header className="h-20 flex items-center justify-center bg-white dark:bg-gray-800 shadow-md">
+          <header className="h-16 sm:h-20 flex items-center justify-between px-6 sm:px-10 bg-white dark:bg-gray-800 shadow-md fixed w-full z-10">
             <Link href={URL_HOME}>
-              <h1 className="text-xl font-bold">조선왕조실록</h1>
+              <h1 className="text-lg sm:text-xl font-bold hover:underline">
+                조선왕조실록
+              </h1>
             </Link>
+            <nav className="hidden sm:flex gap-4">
+              <Link href="/about" className="hover:underline">
+                소개
+              </Link>
+              <Link href="/contact" className="hover:underline">
+                문의
+              </Link>
+            </nav>
           </header>
 
           {/* Main Content */}
-          <div className="flex-1 flex justify-center items-start w-full">
+          <main className="flex-1 flex justify-center items-start w-full pt-20 sm:pt-24 px-4 sm:px-6">
             {children}
-          </div>
+          </main>
 
           {/* 푸터 */}
-          <footer className="h-20 flex gap-6 flex-wrap items-center justify-center bg-white dark:bg-gray-800 mt-8">
-            <div className="text-center">
-              <p>
-                © {new Date().getFullYear()} Image Insight by SWK. All rights
-                reserved.
-              </p>
-            </div>
+          <footer className="h-16 sm:h-20 flex flex-col sm:flex-row gap-4 items-center justify-between px-6 sm:px-10 bg-white dark:bg-gray-800 shadow-inner mt-8">
+            <p className="text-sm">
+              © {new Date().getFullYear()} Image Insight by SWK. All rights
+              reserved.
+            </p>
             <a
-              className="flex items-center gap-2 hover:underline hover:underline-offset-4"
+              className="flex items-center gap-2 hover:underline"
               href="https://github.com/loquemedalagana/joseon-sillok-frontend"
               target="_blank"
               rel="noopener noreferrer"

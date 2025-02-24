@@ -10,14 +10,15 @@ export default async function Home() {
   }
 
   const html = await response.text();
-  const kings = extractKingBasicInfo(html); // { koa: "광해군중초본(1608년~)", kob: "광해군정초본(1608년~)" }
+  const kings = extractKingBasicInfo(html);
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]  text-gray-800 dark:text-gray-200">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-mono">
+    <div className="grid min-h-screen items-center justify-items-center p-8 sm:p-20 gap-16 text-gray-800 dark:text-gray-200">
+      <main className="flex flex-col gap-8 items-center w-full max-w-3xl">
+        <h2 className="text-2xl font-bold">조선의 군왕들</h2>
+        <ol className="list-decimal list-inside space-y-4">
           {Object.entries(kings).map(([id, name]) => (
-            <li key={id} className="mb-2">
+            <li key={id}>
               <Link
                 href={`/${id}`}
                 className="text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 dark:hover:text-blue-200 transition-colors"

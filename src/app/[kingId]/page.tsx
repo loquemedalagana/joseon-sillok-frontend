@@ -3,10 +3,12 @@ import {
   SILLOK_LANDING_URL,
 } from '@/constants/endpoints';
 import { parseKingYearData } from '@/utils/parseKingYearData';
-import { extractKingBasicInfo, extractKingTitle } from '@/utils/extractKingBasicInfo';
+import {
+  extractKingBasicInfo,
+  extractKingTitle,
+} from '@/utils/extractKingBasicInfo';
 import { Metadata } from 'next';
 
-// 1️⃣ 동적 경로 생성을 위한 함수
 export async function generateStaticParams() {
   const response = await fetch(SILLOK_LANDING_URL);
 
@@ -15,14 +17,11 @@ export async function generateStaticParams() {
   }
 
   const html = await response.text();
-  const kingIds = Object.keys(extractKingBasicInfo(html)); // { koa: "광해군중초본", kob: "광해군정초본" }
+  const kingIds = Object.keys(extractKingBasicInfo(html));
 
-  return kingIds.map((kingId) => ({
-    kingId,
-  }));
+  return kingIds.map((kingId) => ({ kingId }));
 }
 
-// 2️⃣ SEO 메타데이터 생성 함수
 export async function generateMetadata({
   params,
 }: {
@@ -49,7 +48,6 @@ export async function generateMetadata({
   };
 }
 
-// 3️⃣ 페이지 컴포넌트
 interface KingDetailPageProps {
   params: {
     kingId: string;
@@ -57,7 +55,7 @@ interface KingDetailPageProps {
 }
 
 export default async function Page({ params }: KingDetailPageProps) {
-  const { kingId } = await params;
+  const { kingId } = params;
   const response = await fetch(`${SILLOK_SEARCH_BASE_URL}?id=${kingId}`);
 
   if (!response.ok) {
@@ -66,7 +64,6 @@ export default async function Page({ params }: KingDetailPageProps) {
 
   const html = await response.text();
   const kingTitle = await extractKingTitle(html, kingId);
-
   const yearData = parseKingYearData(html, kingId);
 
   return (
@@ -78,23 +75,22 @@ export default async function Page({ params }: KingDetailPageProps) {
         </div>
       ) : (
         yearData.map((year) => (
-          <div key={year.year} className="mb-8">
+          <section key={year.year} className="mb-8">
             <h2 className="text-2xl font-semibold mb-2">
               {year.title} - {year.year}년
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
               {year.months.map((month) => (
-                <div
+                <a
                   key={month.id}
+                  href={`#${month.id}`}
                   className="p-2 bg-blue-100 dark:bg-blue-800 text-center rounded shadow hover:bg-blue-200 dark:hover:bg-blue-700 transition"
                 >
-                  <a href={`#${month.id}`} className="text-sm font-medium">
-                    {month.title}
-                  </a>
-                </div>
+                  {month.title}
+                </a>
               ))}
             </div>
-          </div>
+          </section>
         ))
       )}
     </div>
