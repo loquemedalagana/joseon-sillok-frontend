@@ -9,6 +9,7 @@ import {
 } from '@/utils/extractKingBasicInfo';
 import { Metadata } from 'next';
 
+// ✅ generateStaticParams - Static Site Generation을 위한 함수
 export async function generateStaticParams() {
   const response = await fetch(SILLOK_LANDING_URL);
 
@@ -22,11 +23,13 @@ export async function generateStaticParams() {
   return kingIds.map((kingId) => ({ kingId }));
 }
 
+// ✅ generateMetadata - 동적으로 메타데이터 생성
 export async function generateMetadata({
   params,
 }: {
-  params: { kingId: string };
+  params: Promise<{ kingId: string }>;
 }): Promise<Metadata> {
+  const { kingId } = await params; // ❗ Next.js 15에서는 비동기 사용
   const response = await fetch(SILLOK_LANDING_URL);
 
   if (!response.ok) {
@@ -36,7 +39,7 @@ export async function generateMetadata({
   const html = await response.text();
   const kingInfo = extractKingBasicInfo(html);
 
-  const kingTitle = kingInfo[params.kingId];
+  const kingTitle = kingInfo[kingId] || null;
 
   return {
     title: kingTitle
@@ -48,14 +51,16 @@ export async function generateMetadata({
   };
 }
 
+// ✅ 명확한 타입 정의
 interface KingDetailPageProps {
-  params: {
+  params: Promise<{
     kingId: string;
-  };
+  }>;
 }
 
+// ✅ 페이지 컴포넌트
 export default async function Page({ params }: KingDetailPageProps) {
-  const { kingId } = params;
+  const { kingId } = await params; // ✅ 비동기로 처리
   const response = await fetch(`${SILLOK_SEARCH_BASE_URL}?id=${kingId}`);
 
   if (!response.ok) {
