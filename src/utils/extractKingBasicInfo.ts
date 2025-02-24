@@ -41,7 +41,7 @@ export async function generateStaticParams() {
   }));
 }
 
-async function extractKingTitle(
+export async function extractKingTitle(
   html: string,
   kingId: string,
 ): Promise<string | null> {

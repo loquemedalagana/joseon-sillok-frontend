@@ -3,7 +3,7 @@ import {
   SILLOK_LANDING_URL,
 } from '@/constants/endpoints';
 import { parseKingYearData } from '@/utils/parseKingYearData';
-import { extractKingBasicInfo } from '@/utils/extractKingBasicInfo';
+import { extractKingBasicInfo, extractKingTitle } from '@/utils/extractKingBasicInfo';
 import { Metadata } from 'next';
 
 // 1️⃣ 동적 경로 생성을 위한 함수
@@ -65,11 +65,13 @@ export default async function Page({ params }: KingDetailPageProps) {
   }
 
   const html = await response.text();
+  const kingTitle = await extractKingTitle(html, kingId);
+
   const yearData = parseKingYearData(html, kingId);
 
   return (
     <div className="min-h-screen p-8 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-      <h1 className="text-3xl font-bold mb-6">상세 기록</h1>
+      <h1 className="text-3xl font-bold mb-6">{kingTitle} 상세 기록</h1>
       {yearData.length === 0 ? (
         <div className="text-center text-lg text-gray-500 dark:text-gray-400">
           데이터를 찾을 수 없습니다.
