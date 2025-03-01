@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import {
   SILLOK_LANDING_URL,
   SILLOK_SEARCH_BASE_URL,
@@ -8,6 +9,8 @@ import { extractKingBasicInfo } from '@/utils/extractKingBasicInfo';
 import { parseKingMonthData } from '@/utils/parseKingMonthData';
 import Link from 'next/link';
 
+// generateStaticParams는 Next.js 13 App Router에서 사용되는 함수입니다.
+// 동적으로 라우트를 생성하는 데 사용됩니다.
 export async function generateStaticParams() {
   const landingRes = await fetch(SILLOK_LANDING_URL);
   if (!landingRes.ok) {
@@ -41,6 +44,33 @@ export async function generateStaticParams() {
   return allParams;
 }
 
+// generateMetadata 함수에서 params를 Promise로 받고, await로 추출하는 버전입니다.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{
+    kingId: string;
+    monthId: string;
+  }>;
+}): Promise<Metadata> {
+  const { monthId, kingId } = await params;
+
+  const kingKey = kingId.substring(1, 2) as keyof typeof kingNameMap;
+  const kingTitle = kingNameMap[kingKey];
+
+  const yearMonthCode = monthId.replace(`${kingId}_1`, '');
+  const yearTitle = parseInt(yearMonthCode.substring(0, 2), 10);
+  const monthTitle = parseInt(yearMonthCode.substring(2, 4), 10);
+
+  const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${monthTitle}월`;
+
+  return {
+    title: pageTitle,
+    description: pageTitle,
+  };
+}
+
+// Page 컴포넌트에서는 MonthDetailPageProps 인터페이스로 params를 Promise로 정의하고 await로 받습니다.
 interface MonthDetailPageProps {
   params: Promise<{
     monthId: string;
