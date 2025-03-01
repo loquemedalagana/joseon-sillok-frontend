@@ -8,6 +8,7 @@ import {
   extractKingTitle,
 } from '@/utils/extractKingBasicInfo';
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 // ✅ generateStaticParams - Static Site Generation을 위한 함수
 export async function generateStaticParams() {
@@ -61,7 +62,9 @@ interface KingDetailPageProps {
 // ✅ 페이지 컴포넌트
 export default async function Page({ params }: KingDetailPageProps) {
   const { kingId } = await params; // ✅ 비동기로 처리
-  const response = await fetch(`${SILLOK_SEARCH_BASE_URL}?id=${kingId}`);
+  const response = await fetch(
+    `${SILLOK_SEARCH_BASE_URL}/inspectionMonthList.do?id=${kingId}`,
+  );
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
@@ -86,13 +89,13 @@ export default async function Page({ params }: KingDetailPageProps) {
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
               {year.months.map((month) => (
-                <a
+                <Link
                   key={month.id}
-                  href={`#${month.id}`}
+                  href={`${kingId}/${month.id}`}
                   className="p-2 bg-blue-100 dark:bg-blue-800 text-center rounded shadow hover:bg-blue-200 dark:hover:bg-blue-700 transition"
                 >
                   {month.title}
-                </a>
+                </Link>
               ))}
             </div>
           </section>
