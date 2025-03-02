@@ -1,5 +1,4 @@
 import * as cheerio from 'cheerio';
-import { SILLOK_SEARCH_BASE_URL } from '@/constants/endpoints';
 
 interface ArticleTitle {
   id: string;
@@ -15,6 +14,8 @@ interface ParsedHeader {
 export const parseKingMonthData = (html: string, monthId: string) => {
   const $ = cheerio.load(html);
   const articles: ArticleTitle[] = [];
+
+  console.log('monthId', monthId);
 
   // 원하는 영역을 찾아 li 태그에 있는 a 태그를 순회
   $('dl.ins_list_main dd ul li a').each((_, element) => {
