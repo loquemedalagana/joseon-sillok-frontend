@@ -61,8 +61,9 @@ export async function generateMetadata({
   const yearMonthCode = monthId.replace(`${kingId}_1`, '');
   const yearTitle = parseInt(yearMonthCode.substring(0, 2), 10);
   const monthTitle = parseInt(yearMonthCode.substring(2, 4), 10);
+  const isLeapMonth = parseInt(yearMonthCode.substring(4, 5), 10);
 
-  const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${monthTitle}월`;
+  const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${isLeapMonth ? '윤' : ''}${monthTitle}월`;
 
   return {
     title: pageTitle,
@@ -98,9 +99,11 @@ export default async function MonthDetailPage({
   const yearMonthCode = monthId.replace(`${kingId}_1`, '');
   const yearTitle = parseInt(yearMonthCode.substring(0, 2), 10);
   const monthTitle = parseInt(yearMonthCode.substring(2, 4), 10);
+  const isLeapMonth = parseInt(yearMonthCode.substring(4, 5), 10);
+
+  const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${isLeapMonth ? '윤' : ''}${monthTitle}월`;
 
   const articleList = parseKingMonthData(html, monthId);
-  const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${monthTitle}월`;
 
   return (
     <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
