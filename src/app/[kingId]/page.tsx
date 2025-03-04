@@ -7,21 +7,14 @@ import {
   extractKingBasicInfo,
   extractKingTitle,
 } from '@/utils/extractKingBasicInfo';
+import { kingIdentifierList } from '@/constants/kings';
 import { Metadata } from 'next';
 import Link from 'next/link';
 
-// ✅ generateStaticParams - Static Site Generation을 위한 함수
 export async function generateStaticParams() {
-  const response = await fetch(SILLOK_LANDING_URL);
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const html = await response.text();
-  const kingIds = Object.keys(extractKingBasicInfo(html));
-
-  return kingIds.map((kingId) => ({ kingId }));
+  return kingIdentifierList.map((kingId) => ({
+    kingId,
+  }));
 }
 
 // ✅ generateMetadata - 동적으로 메타데이터 생성
