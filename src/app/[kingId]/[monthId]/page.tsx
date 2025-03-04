@@ -1,58 +1,52 @@
 import { Metadata } from 'next';
-import {
-  SILLOK_LANDING_URL,
-  SILLOK_SEARCH_BASE_URL,
-} from '@/constants/endpoints';
-import { kingNameMap } from '@/constants/kings';
-import { parseKingYearData } from '@/utils/parseKingYearData';
-import { extractKingBasicInfo } from '@/utils/extractKingBasicInfo';
-import { parseKingMonthData } from '@/utils/parseKingMonthData';
+import { promises as fs } from 'fs';
 import Link from 'next/link';
+import path from 'path';
 
-// generateStaticParams는 Next.js 13 App Router에서 사용되는 함수입니다.
-// 동적으로 라우트를 생성하는 데 사용됩니다.
+import { SILLOK_SEARCH_BASE_URL } from '@/constants/endpoints';
+import { kingNameMap } from '@/constants/kings';
+import { parseKingMonthData } from '@/utils/parseKingMonthData';
+import { kingIdentifierList } from '@/constants/kings';
+
+type KingMonthParams = { kingId: string; monthId: string };
+
 export async function generateStaticParams() {
-  const landingRes = await fetch(SILLOK_LANDING_URL);
-  if (!landingRes.ok) {
-    throw new Error(`HTTP error! status: ${landingRes.status}`);
-  }
-  const landingHtml = await landingRes.text();
-  const kingInfo = extractKingBasicInfo(landingHtml);
-  const kingIds = Object.keys(kingInfo);
+  const kingIds = kingIdentifierList;
+  const allParams: KingMonthParams[] = [];
 
-  const allParams = [];
   for (const kingId of kingIds) {
-    const res = await fetch(
-      `${SILLOK_SEARCH_BASE_URL}/inspectionMonthList.do?id=${kingId}`,
-    );
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-    const html = await res.text();
-    const yearData = parseKingYearData(html, kingId);
+    const fileName = `w${kingId.slice(1)}_monthIds.json`;
+    const filePath = path.join(process.cwd(), 'src/data/json/months', fileName);
 
-    for (const year of yearData) {
-      for (const month of year.months) {
-        allParams.push({
-          kingId,
-          monthId: month.id,
-        });
+    try {
+      const fileContent = await fs.readFile(filePath, 'utf-8');
+      const monthIds: string[] = JSON.parse(fileContent);
+
+      // JSON 배열에서 "waa_1"로 시작하는 값만 필터링
+      const matchingMonthIds = monthIds.filter((monthId) =>
+        monthId.startsWith(`w${kingId.slice(1)}_1`),
+      );
+
+      for (const monthId of matchingMonthIds) {
+        // 변환 규칙: monthId의 첫 글자가 w에서 k로 변경
+        const transformedMonthId = monthId.replace(/^w/, 'k');
+        allParams.push({ kingId, monthId: transformedMonthId });
       }
+    } catch (error) {
+      console.error(`Error reading file ${fileName}:`, error);
+      // 파일이 없거나 읽기 실패 시 추가 처리가 필요하다면 여기에 구현
     }
   }
 
   return allParams;
 }
 
-// generateMetadata 함수에서 params를 Promise로 받고, await로 추출하는 버전입니다.
+interface MonthDetailPageProps {
+  params: Promise<KingMonthParams>;
+}
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{
-    kingId: string;
-    monthId: string;
-  }>;
-}): Promise<Metadata> {
+}: MonthDetailPageProps): Promise<Metadata> {
   const { monthId, kingId } = await params;
 
   const kingKey = kingId.substring(1, 2) as keyof typeof kingNameMap;
@@ -61,21 +55,29 @@ export async function generateMetadata({
   const yearMonthCode = monthId.replace(`${kingId}_1`, '');
   const yearTitle = parseInt(yearMonthCode.substring(0, 2), 10);
   const monthTitle = parseInt(yearMonthCode.substring(2, 4), 10);
+  const isLeapMonth = parseInt(yearMonthCode.substring(4, 5), 10);
 
-  const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${monthTitle}월`;
+  const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${isLeapMonth ? '윤' : ''}${monthTitle}월`;
+
+  if (monthId.includes('ja_11002')) {
+    return {
+      title: pageTitle,
+      description: '연산군 외모 묘사',
+      keywords: [
+        pageTitle,
+        '연산군',
+        '연산군 외모',
+        '외모',
+        '연산군 외모 묘사',
+        '김수명',
+      ],
+    };
+  }
 
   return {
     title: pageTitle,
     description: pageTitle,
   };
-}
-
-// Page 컴포넌트에서는 MonthDetailPageProps 인터페이스로 params를 Promise로 정의하고 await로 받습니다.
-interface MonthDetailPageProps {
-  params: Promise<{
-    monthId: string;
-    kingId: string;
-  }>;
 }
 
 export default async function MonthDetailPage({
@@ -98,9 +100,11 @@ export default async function MonthDetailPage({
   const yearMonthCode = monthId.replace(`${kingId}_1`, '');
   const yearTitle = parseInt(yearMonthCode.substring(0, 2), 10);
   const monthTitle = parseInt(yearMonthCode.substring(2, 4), 10);
+  const isLeapMonth = parseInt(yearMonthCode.substring(4, 5), 10);
+
+  const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${isLeapMonth ? '윤' : ''}${monthTitle}월`;
 
   const articleList = parseKingMonthData(html, monthId);
-  const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${monthTitle}월`;
 
   return (
     <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
