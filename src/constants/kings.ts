@@ -25,3 +25,12 @@ export const kingNameMap = {
   x: '헌종',
   y: '철종',
 } as const;
+
+export const kingIdentifierList = 'abcdefghijklmnopqrstuvwxy'
+  .split('')
+  .reduce((acc, cur) => {
+    if ((cur >= 'n' && cur <= 'o') || (cur >= 'r' && cur <= 't')) {
+      return [...acc, `k${cur}a`, `k${cur}b`];
+    }
+    return [...acc, `k${cur}a`];
+  }, [] as string[]);

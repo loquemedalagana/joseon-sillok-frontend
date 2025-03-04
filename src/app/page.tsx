@@ -17,16 +17,21 @@ export default async function Home() {
       <main className="flex flex-col gap-8 items-center w-full max-w-3xl">
         <h2 className="text-2xl font-bold">조선의 군왕들</h2>
         <ol className="list-decimal list-inside space-y-4">
-          {Object.entries(kings).map(([id, name]) => (
-            <li key={id}>
-              <Link
-                href={`/${id}`}
-                className="text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 dark:hover:text-blue-200 transition-colors"
-              >
-                {name}
-              </Link>
-            </li>
-          ))}
+          {Object.entries(kings).map(([id, name]) => {
+            if (id[1] < 'z') {
+              return (
+                <li key={id}>
+                  <Link
+                    href={`/${id}`}
+                    className="text-blue-600 dark:text-blue-400 hover:underline hover:text-blue-800 dark:hover:text-blue-200 transition-colors"
+                  >
+                    {name}
+                  </Link>
+                </li>
+              );
+            }
+            return null;
+          })}
         </ol>
       </main>
     </div>
