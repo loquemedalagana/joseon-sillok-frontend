@@ -41,9 +41,16 @@ export async function generateStaticParams() {
   return allParams;
 }
 
+type ArticleTitle = {
+  id: string;
+  mainTitle: string;
+  date: string;
+}
+
 interface MonthDetailPageProps {
   params: Promise<KingMonthParams>;
 }
+
 export async function generateMetadata({
   params,
 }: MonthDetailPageProps): Promise<Metadata> {
@@ -84,6 +91,13 @@ export default async function MonthDetailPage({
   params,
 }: MonthDetailPageProps) {
   const { monthId, kingId } = await params;
+
+  const fileName = `w${monthId.slice(1, 7)}_titles.json`;
+  const filePath = path.join(process.cwd(), `src/data/json/titles/w${kingId.slice(1)}`, fileName);
+  const fileContent = await fs.readFile(filePath, 'utf-8');
+  const titleList: ArticleTitle[] = JSON.parse(fileContent);
+
+  console.log(titleList);
 
   const response = await fetch(
     `${SILLOK_SEARCH_BASE_URL}/inspectionDayList.do?id=${monthId}`,
