@@ -1,16 +1,12 @@
 import { Metadata } from 'next';
-import {
-  SILLOK_LANDING_URL,
-  SILLOK_SEARCH_BASE_URL,
-} from '@/constants/endpoints';
-import { kingNameMap } from '@/constants/kings';
-import { parseKingYearData } from '@/utils/parseKingYearData';
-import { extractKingBasicInfo } from '@/utils/extractKingBasicInfo';
-import { parseKingMonthData } from '@/utils/parseKingMonthData';
-import { kingIdentifierList } from '@/constants/kings';
 import { promises as fs } from 'fs';
 import Link from 'next/link';
 import path from 'path';
+
+import { SILLOK_SEARCH_BASE_URL } from '@/constants/endpoints';
+import { kingNameMap } from '@/constants/kings';
+import { parseKingMonthData } from '@/utils/parseKingMonthData';
+import { kingIdentifierList } from '@/constants/kings';
 
 type KingMonthParams = { kingId: string; monthId: string };
 
@@ -45,12 +41,12 @@ export async function generateStaticParams() {
   return allParams;
 }
 
-// generateMetadata 함수에서 params를 Promise로 받고, await로 추출하는 버전입니다.
+interface MonthDetailPageProps {
+  params: Promise<KingMonthParams>;
+}
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<KingMonthParams>;
-}): Promise<Metadata> {
+}: MonthDetailPageProps): Promise<Metadata> {
   const { monthId, kingId } = await params;
 
   const kingKey = kingId.substring(1, 2) as keyof typeof kingNameMap;
@@ -65,13 +61,8 @@ export async function generateMetadata({
 
   return {
     title: pageTitle,
-    description: pageTitle,
+    description: monthId.includes('ja_11002') ? '연산군 외모 묘사' : pageTitle,
   };
-}
-
-// Page 컴포넌트에서는 MonthDetailPageProps 인터페이스로 params를 Promise로 정의하고 await로 받습니다.
-interface MonthDetailPageProps {
-  params: Promise<KingMonthParams>;
 }
 
 export default async function MonthDetailPage({
