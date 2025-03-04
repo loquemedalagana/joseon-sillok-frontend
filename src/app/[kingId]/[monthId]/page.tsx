@@ -3,9 +3,7 @@ import { promises as fs } from 'fs';
 import Link from 'next/link';
 import path from 'path';
 
-import { SILLOK_SEARCH_BASE_URL } from '@/constants/endpoints';
 import { kingNameMap } from '@/constants/kings';
-import { parseKingMonthData } from '@/utils/parseKingMonthData';
 import { kingIdentifierList } from '@/constants/kings';
 
 type KingMonthParams = { kingId: string; monthId: string };
@@ -41,9 +39,16 @@ export async function generateStaticParams() {
   return allParams;
 }
 
+type ArticleTitle = {
+  id: string;
+  mainTitle: string;
+  date: string;
+};
+
 interface MonthDetailPageProps {
   params: Promise<KingMonthParams>;
 }
+
 export async function generateMetadata({
   params,
 }: MonthDetailPageProps): Promise<Metadata> {
@@ -85,15 +90,15 @@ export default async function MonthDetailPage({
 }: MonthDetailPageProps) {
   const { monthId, kingId } = await params;
 
-  const response = await fetch(
-    `${SILLOK_SEARCH_BASE_URL}/inspectionDayList.do?id=${monthId}`,
+  const fileName = `w${monthId.slice(1, 7)}_titles.json`;
+  const filePath = path.join(
+    process.cwd(),
+    `src/data/json/titles/w${kingId.slice(1)}`,
+    fileName,
   );
+  const fileContent = await fs.readFile(filePath, 'utf-8');
+  const titleList: ArticleTitle[] = JSON.parse(fileContent);
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const html = await response.text();
   const kingKey = kingId.substring(1, 2) as keyof typeof kingNameMap;
   const kingTitle = kingNameMap[kingKey];
 
@@ -104,7 +109,7 @@ export default async function MonthDetailPage({
 
   const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${isLeapMonth ? '윤' : ''}${monthTitle}월`;
 
-  const articleList = parseKingMonthData(html, monthId);
+  // const articleList = parseKingMonthData(html, monthId);
 
   return (
     <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-8 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
@@ -112,16 +117,16 @@ export default async function MonthDetailPage({
         {pageTitle}
       </h1>
       <ul className="space-y-3">
-        {articleList.map((article) => (
+        {titleList.map((article) => (
           <li
             key={article.id}
             className="border-b pb-2 last:border-b-0 dark:border-gray-700"
           >
             <Link
-              href={`/${kingId}/${monthId}?id=${article.id}`}
+              href={`/${kingId}/${monthId}?id=k${article.id.slice(1)}`}
               className="text-blue-600 dark:text-blue-400 hover:underline block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              {article.title}
+              {article.mainTitle}
             </Link>
           </li>
         ))}
