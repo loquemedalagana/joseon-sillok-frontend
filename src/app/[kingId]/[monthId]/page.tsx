@@ -59,9 +59,24 @@ export async function generateMetadata({
 
   const pageTitle = `${kingTitle} ${yearTitle || '즉위'}년 ${isLeapMonth ? '윤' : ''}${monthTitle}월`;
 
+  if (monthId.includes('ja_11002')) {
+    return {
+      title: pageTitle,
+      description: '연산군 외모 묘사',
+      keywords: [
+        pageTitle,
+        '연산군',
+        '연산군 외모',
+        '외모',
+        '연산군 외모 묘사',
+        '김수명',
+      ],
+    };
+  }
+
   return {
     title: pageTitle,
-    description: monthId.includes('ja_11002') ? '연산군 외모 묘사' : pageTitle,
+    description: pageTitle,
   };
 }
 
