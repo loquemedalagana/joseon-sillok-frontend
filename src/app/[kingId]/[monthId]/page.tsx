@@ -117,19 +117,21 @@ export default async function MonthDetailPage({
         {pageTitle}
       </h1>
       <ul className="space-y-3">
-        {titleList.map((article) => (
-          <li
-            key={article.id}
-            className="border-b pb-2 last:border-b-0 dark:border-gray-700"
-          >
-            <Link
-              href={`/${kingId}/${monthId}?id=k${article.id.slice(1)}`}
-              className="text-blue-600 dark:text-blue-400 hover:underline block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+        {titleList
+          .filter((article) => article.id.includes(monthId.substring(1)))
+          .map((article) => (
+            <li
+              key={article.id}
+              className="border-b pb-2 last:border-b-0 dark:border-gray-700"
             >
-              {article.mainTitle}
-            </Link>
-          </li>
-        ))}
+              <Link
+                href={`/${kingId}/${monthId}?id=k${article.id.slice(1)}`}
+                className="text-blue-600 dark:text-blue-400 hover:underline block p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                {article.mainTitle}
+              </Link>
+            </li>
+          ))}
       </ul>
     </div>
   );
